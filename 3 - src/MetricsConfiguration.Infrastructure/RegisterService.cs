@@ -1,7 +1,11 @@
 ﻿using MetricsConfiguration.Domain.Interface.Cache;
 using MetricsConfiguration.Domain.Interface.Client;
+using MetricsConfiguration.Domain.Interface.Repositories;
 using MetricsConfiguration.Infrastructure.Cache;
 using MetricsConfiguration.Infrastructure.Client;
+using MetricsConfiguration.Infrastructure.DataConnector;
+using MetricsConfiguration.Infrastructure.Interfaces.DataConnector;
+using MetricsConfiguration.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +18,9 @@ namespace MetricsConfiguration.Infrastructure
             services.AddMemoryCache();
             services.AddScoped<IRedisCacheStorage, RedisCacheStorage>();
             services.AddScoped<IMemoryCacheStorage, MemoryCacheStorage>();
+            services.AddScoped<IDbSqlServerConnector>(db => new SqlServerConnector(configuration.GetConnectionString("ViabilidadeSQLServer")));
+            services.AddScoped<IDbPostgreConnector>(db => new PostgreConnector(configuration.GetConnectionString("ViabilidadePostgreSQL")));
+
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = configuration["Cache:RedisCache:Url"];
@@ -41,6 +48,9 @@ namespace MetricsConfiguration.Infrastructure
             {
                 config.BaseAddress = new Uri(configuration["Clients:Chuck:BasePath"]);
             });
+
+            services.AddScoped<IOriginRepository, OriginRepository>();
+
         }
     }
 }
