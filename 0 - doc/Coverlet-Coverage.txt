@@ -1,0 +1,3 @@
+https://github.com/coverlet-coverage/coverlet
+
+dotnet test --collect:"XPlat Code Coverage"

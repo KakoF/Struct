@@ -1,0 +1,64 @@
+version: "3.8"
+services:
+  redis:
+    container_name: 'redis_server'
+    image: redis
+    restart: always
+    command: redis-server --requirepass Atlas-Metrics@#
+    ports:
+      - '6379:6379'
+
+  AtlasMetricsOriginsBase:
+    container_name: 'metrics-origins-database'
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    restart: always
+    volumes:
+      - ~/apps/mssql/data:/var/lib/mssqlql/data
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: '!AtlasMetricsOrigins'
+    ports:
+      - '1431:1433'
+    expose:
+      - '1431'
+
+  AtlasMetricsConfigurationBase:
+    container_name: 'metrics-configuration-database'
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    restart: always
+    volumes:
+      - ~/apps/mssql/data:/var/lib/mssqlql/data
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: '!AtlasMetricsConfiguration'
+    ports:
+      - '1432:1433'
+    expose:
+      - '1432'
+
+  AtlasMetricsConfigurationHistoryBase:
+    container_name: 'metrics-configuration-history-database'
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    restart: always
+    volumes:
+      - ~/apps/mssql/data:/var/lib/mssqlql/data
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: '!AtlasMetricsConfigurationHistory'
+    ports:
+      - '1433:1433'
+    expose:
+      - '1433'
+  
+  app:
+    container_name: 'atlas-metrics-api'
+    build: 
+      dockerfile: '/1 - deploy/dockerfiles/Dockerfile'
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - 9090:80
+    depends_on:
+      - redis
+    links:
+      - redis

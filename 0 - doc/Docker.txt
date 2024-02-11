@@ -1,0 +1,13 @@
+Gerar imagem, na raiz do projeto:
+docker build -t atlas-metrics-configuration-api -f "1 - deploy\dockerfiles\Dockerfile" .
+
+Buildar Imagem:
+docker run -d -p 9090:80 -e ASPNETCORE_ENVIRONMENT=Development --name atlas-metrics-configuration-api atlas-metrics-configuration-api
+
+
+http://localhost:9090/swagger/index.html
+
+
+
+Gerenciar todas dependencias de infrastrutura:
+docker compose up -d
